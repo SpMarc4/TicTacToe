@@ -43,6 +43,14 @@ const Gameboard = ((numCells) => {
         }
     }
     
+    const setGameBoardCell = (i, j, marker) => {
+        gameBoardArray.at(i).at(j) = marker;
+    }
+
+
+    const getGameBoardCell = () => {
+
+    }
     // TODO Renderizado de una única celda para no recorrer toda la matriz
 
 
@@ -54,11 +62,41 @@ const Gameboard = ((numCells) => {
     const container = createGameBoardContainer();
     ResetGameBoardArray(numCells);
     RenderGameBoardCells(container, gameBoardArray);
+
+    // .map( (cell) => {
+        // console.log(cell.id)
+    // })
     displayGameBoard(container);
     
-    return {gameBoardArray, ResetGameBoardArray, RenderGameBoardCells};
+    const celulas = document.querySelectorAll("div.cell");
+
+    // Revisar
+
+    celulas.forEach( (cell) => {
+        cell.addEventListener("click", function sendGameBoardCell () {
+            console.log(cell.id)
+            return cell.id;
+        })
+
+    })
+
+
+    return {sendGameBoardCell, setGameBoardCell, ResetGameBoardArray, RenderGameBoardCells};
     
 })(3);
+
+const Player = (marker) => {
+    let score = 0;
+
+    const getCell = () => {
+
+    }
+
+    const setMarker = (marker) => {
+
+    }
+
+}
 console.log(typeof Gameboard)
 // - Jugadores
 // - Objeto de Control de Juego
