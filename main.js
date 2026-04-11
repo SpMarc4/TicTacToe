@@ -1,29 +1,50 @@
 // 3 Objetos
 // - Tablero
 
-const gameBoard = ((numCells) => {
+const Gameboard = ((numCells) => {
+    // Se crea la constante del tablero
+    let gameBoardArray = [];
 
-    console.log("Entro");
+    // Se incializan/resetean las celdas del gambeBoardArray
+    const ResetGameBoardArray = (numCells) => {
+        gameBoardArray = Array(numCells).fill(Array(numCells).fill(""));
+        console.log(gameBoardArray)
+    }
+    
+
+    // Se crea el objeto del DOM
     const createGameBoardContainer = () => {
         const gameBoardContainer = document.createElement('div');
-        console.log("Entro en la creación del gameboard");
         gameBoardContainer.setAttribute("id", "gameboard-container");
         return gameBoardContainer
     };
-    
-    const createGameBoardCells = (container, numCells) => {
-        for (let i = 1; i <= numCells**2; i++) {
+
+
+    // Se renderiza el objeto del DOM
+    // Se almacena en el id el índice de la matriz, así posteriormente
+    // Se puede identificar rápido cuando se pulser una celda
+    const RenderGameBoardCells = (container, gameBoardArray) => {
+        let cont = 0;
+        for (let i = 0; i < gameBoardArray.length ; i++) {
             console.log(i)
-            const gameBoardCell = document.createElement('div');
-            gameBoardCell.style.setProperty("flex", `1 1 ${100/numCells}%`);
-            gameBoardCell.setAttribute("class", "cell");
-            
-            container.appendChild(gameBoardCell);
-            if (i>=10) {
-                break;
+            for (let j = 0; j < gameBoardArray.at(i).length ; j++) {
+                console.log(j);
+                const gameBoardCell = document.createElement('div');
+                gameBoardCell.style.setProperty("flex", `1 1 ${100/numCells}%`);
+                gameBoardCell.setAttribute("id", `${i}-${j}`);
+                gameBoardCell.setAttribute("class", "cell");
+                gameBoardCell.textContent = String(gameBoardArray.at(i).at(j)); 
+                container.appendChild(gameBoardCell);
+                cont += 1;
+                if (cont >= numCells**2) {
+                    break;
+                }
             }
-        }   
+        }
     }
+    
+    // TODO Renderizado de una única celda para no recorrer toda la matriz
+
 
     const displayGameBoard = (container) => {
         const body = document.querySelector("body");
@@ -31,10 +52,14 @@ const gameBoard = ((numCells) => {
     };
 
     const container = createGameBoardContainer();
-    createGameBoardCells(container, numCells);
+    ResetGameBoardArray(numCells);
+    RenderGameBoardCells(container, gameBoardArray);
     displayGameBoard(container);
+    
+    return {gameBoardArray, ResetGameBoardArray, RenderGameBoardCells};
+    
 })(3);
-
+console.log(typeof Gameboard)
 // - Jugadores
 // - Objeto de Control de Juego
 
