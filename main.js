@@ -4,26 +4,32 @@
 const Gameboard = ((numCells) => {
     // Se crea la constante del tablero
     let gameBoardArray = [];
-
+    let gameBoardContainer = undefined;
     // Se incializan/resetean las celdas del gambeBoardArray
-    const ResetGameBoardArray = (numCells) => {
-        gameBoardArray = Array(numCells).fill(Array(numCells).fill(""));
+    const ResetGameBoardArray = () => {
+        gameBoardArray = Array(numCells)
+        .fill(null)
+        .map(() => {return Array(numCells)});
         console.log(gameBoardArray)
     }
     
 
     // Se crea el objeto del DOM
     const createGameBoardContainer = () => {
-        const gameBoardContainer = document.createElement('div');
-        gameBoardContainer.setAttribute("id", "gameboard-container");
-        return gameBoardContainer
+        const container = document.createElement('div');
+        container.setAttribute("id", "gameboard-container");
+        gameBoardContainer = container
     };
 
+    const deleteGameBoardContainer = () => {
+        const gameBoardContainer = document.getElementById("gameboard-container");
+        gameBoardContainer.remove();
+    }
 
     // Se renderiza el objeto del DOM
     // Se almacena en el id el índice de la matriz, así posteriormente
     // Se puede identificar rápido cuando se pulser una celda
-    const RenderGameBoardCells = (container, gameBoardArray) => {
+    const createGameBoardCells = () => {
         let cont = 0;
         for (let i = 0; i < gameBoardArray.length ; i++) {
             console.log(i)
@@ -33,8 +39,8 @@ const Gameboard = ((numCells) => {
                 gameBoardCell.style.setProperty("flex", `1 1 ${100/numCells}%`);
                 gameBoardCell.setAttribute("id", `${i}-${j}`);
                 gameBoardCell.setAttribute("class", "cell");
-                gameBoardCell.textContent = String(gameBoardArray.at(i).at(j)); 
-                container.appendChild(gameBoardCell);
+                gameBoardCell.textContent = gameBoardArray[i][j]; 
+                gameBoardContainer.appendChild(gameBoardCell);
                 cont += 1;
                 if (cont >= numCells**2) {
                     break;
@@ -42,61 +48,68 @@ const Gameboard = ((numCells) => {
             }
         }
     }
+
+    const displayGameBoard = () => {
+        const body = document.querySelector("body");
+        body.appendChild(gameBoardContainer)
+    };
+
+    const RenderGameBoard = () => {
+        const gameBoardContainer = document.getElementById("gameboard-container");
+        if(gameBoardContainer) {deleteGameBoardContainer()};
+        createGameBoardContainer();
+        createGameBoardCells();
+        displayGameBoard();
+    }
     
     const setGameBoardCell = (i, j, marker) => {
-        gameBoardArray.at(i).at(j) = marker;
+        const element = gameBoardArray[i][j];
+        gameBoardArray[i][j] = marker;
     }
 
-
-    const getGameBoardCell = () => {
-
-    }
     // TODO Renderizado de una única celda para no recorrer toda la matriz
 
 
-    const displayGameBoard = (container) => {
-        const body = document.querySelector("body");
-        body.appendChild(container)
-    };
-
-    const container = createGameBoardContainer();
-    ResetGameBoardArray(numCells);
-    RenderGameBoardCells(container, gameBoardArray);
-
+    ResetGameBoardArray();
+    RenderGameBoard();
     // .map( (cell) => {
         // console.log(cell.id)
     // })
-    displayGameBoard(container);
-    
-    const celulas = document.querySelectorAll("div.cell");
 
-    // Revisar
-
-    celulas.forEach( (cell) => {
-        cell.addEventListener("click", function sendGameBoardCell () {
-            console.log(cell.id)
-            return cell.id;
-        })
-
-    })
-
-
-    return {sendGameBoardCell, setGameBoardCell, ResetGameBoardArray, RenderGameBoardCells};
+    return {setGameBoardCell, ResetGameBoardArray, RenderGameBoard};
     
 })(3);
 
-const Player = (marker) => {
-    let score = 0;
+Gameboard.setGameBoardCell(1,1,'X');
+Gameboard.RenderGameBoard()
+Gameboard.setGameBoardCell(1,2,'O');
+Gameboard.RenderGameBoard()
 
-    const getCell = () => {
+// const Player = (setGameBoardCell ,marker) => {
+//     let score = 0;
+    
+//     const cells = document.querySelectorAll("div.cell");
 
-    }
+//     cells.forEach( (cell) => {
+//         cell.addEventListener("click", () => {
+//             console.log(cell.id)
+//             setMarker(cell, marker)
+//         })
 
-    const setMarker = (marker) => {
+//     });
 
-    }
+//     const setMarker = (cell, marker) => {
+//         const cellCoordinates = cell.id;
+//         let [xCord, yCord] = cellCoordinates
+//             .split('-')
+//             .map((coordinate) => parseInt(coordinate))
+//         setGameBoardCell(xCord, yCord, marker);
+//     }
 
-}
+
+// }
+
+// Player(Gameboard.setGameBoardCell ,"X")
 console.log(typeof Gameboard)
 // - Jugadores
 // - Objeto de Control de Juego

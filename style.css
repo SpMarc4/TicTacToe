@@ -16,9 +16,12 @@ body {
     border: 1px solid black;
     display: flex;
     flex-wrap: wrap;
+    text-align: center;
+    align-items: stretch;
 }
 
 .cell {
     border: 1px solid red;
     box-sizing: border-box;
+    align-content: center;
 }
