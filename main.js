@@ -24,9 +24,7 @@ const Gameboard = ((numCells) => {
         gameBoardContainer = container
         let cont = 0;
         for (let i = 0; i < gameBoardArray.length ; i++) {
-            console.log(i)
             for (let j = 0; j < gameBoardArray.at(i).length ; j++) {
-                console.log(j);
                 const gameBoardCell = document.createElement('div');
                 gameBoardCell.style.setProperty("flex", `1 1 ${100/numCells}%`);
                 gameBoardCell.setAttribute("id", `${i}-${j}`);
@@ -70,30 +68,31 @@ const Gameboard = ((numCells) => {
         return cells;
     };
 
-    return {getCells, setGameBoardCell, resetGameBoardArray, RenderGameBoard};
+    const getGambeBoardArray = () => {
+        return gameBoardArray
+    };
+
+    return {getCells, getGambeBoardArray, setGameBoardCell, resetGameBoardArray, RenderGameBoard};
     
 })(3);
 
 const Player = (marker) => {
-    const totalScore = 0;
-    const gameScore = 0;
+    let playerScore = 0;
     const playerMarker = marker;
 
-
-
-    const getTotalScore = () => {
-        return totalScore;
+    const setPlayerScore = () => {
+        playerScore += 1;
     };
 
-    const getGameScore = () => {
-        return gameScore;
+    const getPlayerScore = () => {
+        return playerScore;
     };
 
     const getPlayerMarker = () => {
         return playerMarker;
     }
 
-    return {getPlayerMarker, getGameScore, getTotalScore}
+    return {getPlayerMarker, getPlayerScore, setPlayerScore}
 
 }
 
@@ -101,11 +100,10 @@ const Game = (() => {
     let endGame = false;
     let correctSelect = true;
     let playerTurn = 2;
-    let actualMarker = "";
     const player1 = Player('X');
     const player2 = Player('O');
-
-    const {getCells, setGameBoardCell, RenderGameBoard} = Gameboard;
+    let player;
+    const {getCells, getGambeBoardArray, setGameBoardCell, RenderGameBoard} = Gameboard;
     const cells = getCells();
 
     const setMarker = (cell, marker) => {
@@ -116,16 +114,48 @@ const Game = (() => {
         correctSelect = setGameBoardCell(xCord, yCord, marker);
     }
 
-    const playTurn = (cell) => {
-        console.log(cell.id);
-        if (playerTurn % 2 == 0) {
-            actualMarker = player1.getPlayerMarker();
+    const selectPlayer = () => {
+        player = (playerTurn % 2 == 0) ? player1 : player2
+    }
+
+    const getCombinations = () => {
+        // Extraemos filas
+        const rows = getGambeBoardArray();
+        let diagonal = [];
+        let diagonalInv = [];
+
+        let combinations = [];
+        // Extraemos columnas y diagonales
+        for (let i = 0; i < rows.length; i++) {
+            // Combinación de filas
+            combinations.push(rows[i]);
+            // Combinación de columnas
+            combinations.push(rows.map( x => x[i] ));
+            diagonal.push(rows[i][i]);
+            diagonalInv.push(rows[i][(rows.length-1)-i])
         }
-        else {
-            actualMarker = player2.getPlayerMarker();
-        };
-        
-        setMarker(cell, actualMarker);
+
+        // Combinación de columnas
+        combinations.push(diagonal);
+        combinations.push(diagonalInv);
+
+        return combinations
+    }
+
+    const isWinner = (marker) => {
+        const combinations = getCombinations();
+        const winnerCombination = JSON.stringify(Array(getGambeBoardArray().length).fill(marker));
+        for (const combination of combinations) {
+            if (JSON.stringify(combination) === winnerCombination) {
+                return true
+            }
+        }
+        return false
+    }
+
+    const playTurn = (cell) => {
+        selectPlayer()
+        setMarker(cell, player.getPlayerMarker());
         RenderGameBoard();
 
         if (correctSelect) {
@@ -133,9 +163,17 @@ const Game = (() => {
         };
     }
 
+    const updatePlayerScore = () => {
+        if (isWinner(player.getPlayerMarker())) {
+            player.setPlayerScore();
+            console.log(`Player ${player.getPlayerMarker()} - Score: ${player.getPlayerScore()}`);
+        }
+    }
+
     cells.forEach( (cell) => {
         cell.addEventListener("click", () => {
             playTurn(cell);
+            updatePlayerScore();
         })
 
     });
