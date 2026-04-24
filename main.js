@@ -17,8 +17,48 @@ const Gameboard = ((numCells) => {
     // Se renderiza el objeto del DOM
     // Se almacena en el id el índice de la matriz, así posteriormente
     // Se puede identificar rápido cuando se pulser una celda
+
+    const createTitle = () => {
+        const title = document.createElement("h1");
+        title.setAttribute("id", "game-title");
+        title.textContent = "Tic Tac Toe";
+        return title;
+    }
+
+    const createScoreBoard = () => {
+        const scoreBoard = document.createElement("div");
+        scoreBoard.setAttribute("id", "scoreboard");
+        const player1Board = document.createElement("div");
+        player1Board.setAttribute("id", "player1-board");
+        const player1Title = document.createElement("h2");
+        player1Title.setAttribute("id", "player1-title");
+        player1Title.textContent = "Player 1";
+        const player1Score = document.createElement("p");
+        player1Score.setAttribute("id", "player1-score");
+        player1Score.textContent = "0";
+        player1Board.appendChild(player1Title);
+        player1Board.appendChild(player1Score);
+
+ 
+        const player2Board = document.createElement("div");
+        player2Board.setAttribute("id", "player2-board");
+        const player2Title = document.createElement("h2");
+        player2Title.setAttribute("id", "player2-title");
+        player2Title.textContent = "Player 2";
+        const player2Score = document.createElement("p");
+        player2Score.setAttribute("id", "player2-score");
+        player2Score.textContent = "0";
+        player2Board.appendChild(player2Title);
+        player2Board.appendChild(player2Score);
+
+
+
+        scoreBoard.appendChild(player1Board);
+        scoreBoard.appendChild(player2Board);
+        return scoreBoard;
+    }
+
     const createGameBoard = () => {
-        const body = document.querySelector("body");
         const container = document.createElement('div');
         container.setAttribute("id", "gameboard-container");
         gameBoardContainer = container
@@ -37,11 +77,34 @@ const Gameboard = ((numCells) => {
                 }
             }
         }
+
+        return gameBoardContainer;
+        
+    }
+
+    const createNewGameButton = () => {
+        const button = document.createElement("button");
+        button.setAttribute("id", "new-game");
+        button.textContent = "New Game"
+
+        return button;
+    }
+
+    const createLayout = () => {
+        const body = document.querySelector("body");
+        const title = createTitle();
+        const gameBoardContainer = createGameBoard();
+        const scoreBoard = createScoreBoard();
+        const newGameButton = createNewGameButton();
+        body.appendChild(title)
+        body.appendChild(scoreBoard)
         body.appendChild(gameBoardContainer);
+        body.appendChild(newGameButton);
+
     }
 
     resetGameBoardArray();
-    createGameBoard();
+    createLayout();
 
     const cells = document.querySelectorAll("div.cell");
     const RenderGameBoard = () => { 
@@ -167,13 +230,16 @@ const Game = (() => {
         if (isWinner(player.getPlayerMarker())) {
             player.setPlayerScore();
             console.log(`Player ${player.getPlayerMarker()} - Score: ${player.getPlayerScore()}`);
+            endGame = true;
         }
     }
-
+    
     cells.forEach( (cell) => {
         cell.addEventListener("click", () => {
-            playTurn(cell);
-            updatePlayerScore();
+            if (!endGame) {
+                playTurn(cell);
+                updatePlayerScore();
+            }
         })
 
     });

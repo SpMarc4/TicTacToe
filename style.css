@@ -6,13 +6,48 @@ html, body {
 
 body {
     display: flex;
+    flex-direction: column;
+    gap: 20px;
     align-items: center;
+}
+
+#scoreboard {
+    display: flex;
+    gap: 20px;
+    justify-items: center;
+    align-content: stretch;
+}
+
+#player1-board,
+#player2-board {
+    display: flex;
+    width: 200px;
+    height: 100px;
+    justify-items: center;
+    align-items: c;
+    flex-direction: column;
+    text-align: center;
+    border: 1px solid black;
+}
+
+#player1-title,
+#player1-score,
+#player2-title,
+#player2-score {
+    margin: 0;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    border: 1px solid black;
 }
 
 #gameboard-container {
     width: 400px;
     height: 400px;
-    margin: auto;
+    margin: 10px;
     border: 1px solid black;
     display: flex;
     flex-wrap: wrap;
