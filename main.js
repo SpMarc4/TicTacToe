@@ -32,7 +32,7 @@ const Gameboard = ((numCells) => {
         player1Board.setAttribute("id", "player1-board");
         const player1Title = document.createElement("h2");
         player1Title.setAttribute("id", "player1-title");
-        player1Title.textContent = "Player 1";
+        player1Title.textContent = "Player 1 [X]";
         const player1Score = document.createElement("p");
         player1Score.setAttribute("id", "player1-score");
         player1Score.textContent = "0";
@@ -44,7 +44,7 @@ const Gameboard = ((numCells) => {
         player2Board.setAttribute("id", "player2-board");
         const player2Title = document.createElement("h2");
         player2Title.setAttribute("id", "player2-title");
-        player2Title.textContent = "Player 2";
+        player2Title.textContent = "Player 2 [O]";
         const player2Score = document.createElement("p");
         player2Score.setAttribute("id", "player2-score");
         player2Score.textContent = "0";
@@ -67,6 +67,8 @@ const Gameboard = ((numCells) => {
             for (let j = 0; j < gameBoardArray.at(i).length ; j++) {
                 const gameBoardCell = document.createElement('div');
                 gameBoardCell.style.setProperty("flex", `1 1 ${100/numCells}%`);
+                gameBoardCell.style.setProperty("height", `${100/numCells}%`);
+                gameBoardCell.style.setProperty("width", `${100/numCells}%`);
                 gameBoardCell.setAttribute("id", `${i}-${j}`);
                 gameBoardCell.setAttribute("class", "cell");
                 gameBoardCell.textContent = gameBoardArray[i][j]; 
@@ -107,7 +109,7 @@ const Gameboard = ((numCells) => {
     createLayout();
 
     const cells = document.querySelectorAll("div.cell");
-    const RenderGameBoard = () => { 
+    const renderGameBoard = () => { 
         for (const cell of cells) {
             let [xCord, yCord] = cell.id
             .split('-')
@@ -134,8 +136,9 @@ const Gameboard = ((numCells) => {
     const getGambeBoardArray = () => {
         return gameBoardArray
     };
+    
 
-    return {getCells, getGambeBoardArray, setGameBoardCell, resetGameBoardArray, RenderGameBoard};
+    return {getCells, getGambeBoardArray, setGameBoardCell, createGameBoard, resetGameBoardArray, renderGameBoard};
     
 })(3);
 
@@ -160,15 +163,15 @@ const Player = (marker) => {
 }
 
 const Game = (() => {
+    let player;
+    let playerTurn = 2;
+    let scoreID = 0;
     let endGame = false;
     let correctSelect = true;
-    let playerTurn = 2;
     const player1 = Player('X');
     const player2 = Player('O');
-    let player;
-    const {getCells, getGambeBoardArray, setGameBoardCell, RenderGameBoard} = Gameboard;
+    const {getCells, getGambeBoardArray, setGameBoardCell, createGameBoard, resetGameBoardArray, renderGameBoard} = Gameboard;
     const cells = getCells();
-
     const setMarker = (cell, marker) => {
         const cellCoordinates = cell.id;
         let [xCord, yCord] = cellCoordinates
@@ -219,8 +222,8 @@ const Game = (() => {
     const playTurn = (cell) => {
         selectPlayer()
         setMarker(cell, player.getPlayerMarker());
-        RenderGameBoard();
-
+        renderGameBoard();
+        scoreID = (playerTurn % 2 == 0) ? "player1-score" : "player2-score";
         if (correctSelect) {
             playerTurn += 1
         };
@@ -229,6 +232,8 @@ const Game = (() => {
     const updatePlayerScore = () => {
         if (isWinner(player.getPlayerMarker())) {
             player.setPlayerScore();
+            const playerScore = document.getElementById(scoreID);
+            playerScore.textContent = player.getPlayerScore();
             console.log(`Player ${player.getPlayerMarker()} - Score: ${player.getPlayerScore()}`);
             endGame = true;
         }
@@ -243,7 +248,18 @@ const Game = (() => {
         })
 
     });
-
+    const button = document.getElementById("new-game");
+    button.addEventListener("click",
+        () => {
+            resetGameBoardArray();
+            createGameBoard();
+            renderGameBoard();
+            player;
+            playerTurn = 2;
+            endGame = false;
+            correctSelect = true;
+        }
+    );
 
 })()
 

@@ -53,9 +53,14 @@ body {
     flex-wrap: wrap;
     text-align: center;
     align-items: stretch;
+    justify-items: stretch;
+    align-content: stretch;
+    justify-content: stretch;
 }
 
 .cell {
+    width: 33.333%;
+    height: 33.333%;
     border: 1px solid red;
     box-sizing: border-box;
     align-content: center;
