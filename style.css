@@ -1,5 +1,14 @@
+:root {
+    --main-bg-color: skyblue;
+    --main-board-color: #a47864;
+    --side-board-color: #955251;
+    --side-color: white;
+    --border-radius: 10px;
+}
+
 html, body {
     font-family: 'Roboto';
+    color: var(--side-color);
     height: 100%;
     width: 100%;
 }
@@ -9,6 +18,15 @@ body {
     flex-direction: column;
     gap: 20px;
     align-items: center;
+    background-color: var(--main-bg-color);
+}
+
+#game-title {
+    text-shadow:
+    1px 1px 0px var(--side-board-color),
+    -1px -1px 0px var(--side-board-color),
+    -1px 1px 0px var(--side-board-color),
+    1px -1px 0px var(--side-board-color);
 }
 
 #scoreboard {
@@ -21,13 +39,12 @@ body {
 #player1-board,
 #player2-board {
     display: flex;
+    gap: 5px;
     width: 200px;
     height: 100px;
     justify-items: center;
-    align-items: c;
     flex-direction: column;
     text-align: center;
-    border: 1px solid black;
 }
 
 #player1-title,
@@ -35,20 +52,22 @@ body {
 #player2-title,
 #player2-score {
     margin: 0;
+    border-radius: var(--border-radius);
+    background-color: var(--main-board-color);
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
     width: 100%;
-    border: 1px solid black;
+    border: 1px solid var(--side-board-color);
 }
 
 #gameboard-container {
     width: 400px;
     height: 400px;
     margin: 10px;
-    border: 1px solid black;
+    border-radius: var(--border-radius);
     display: flex;
     flex-wrap: wrap;
     text-align: center;
@@ -59,9 +78,23 @@ body {
 }
 
 .cell {
-    width: 33.333%;
-    height: 33.333%;
-    border: 1px solid red;
+    border: 1px solid var(--side-board-color);
+    background-color: var(--main-board-color);
+    border-radius: var(--border-radius);
     box-sizing: border-box;
     align-content: center;
+    font-weight: bold;
+}
+
+#new-game {
+    border: 2px solid var(--side-board-color);
+    border-radius: var(--border-radius);
+    color: var(--side-color);
+    font-weight: bold;
+    padding: 10px;
+    background-color: var(--main-board-color);
+}
+
+#new-game:hover {
+    cursor: pointer;
 }

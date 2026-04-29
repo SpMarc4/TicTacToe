@@ -68,7 +68,6 @@ const Gameboard = ((numCells) => {
                 const gameBoardCell = document.createElement('div');
                 gameBoardCell.style.setProperty("flex", `1 1 ${100/numCells}%`);
                 gameBoardCell.style.setProperty("height", `${100/numCells}%`);
-                gameBoardCell.style.setProperty("width", `${100/numCells}%`);
                 gameBoardCell.setAttribute("id", `${i}-${j}`);
                 gameBoardCell.setAttribute("class", "cell");
                 gameBoardCell.textContent = gameBoardArray[i][j]; 
