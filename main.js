@@ -1,22 +1,76 @@
 // 3 Objetos
 // - Tablero
 
+
+
 const Gameboard = ((numCells) => {
     // Se crea la constante del tablero
     let gameBoardArray = [];
-    let gameBoardContainer = undefined;
     // Se incializan/resetean las celdas del gambeBoardArray
 
     const resetGameBoardArray = () => {
         gameBoardArray = Array(numCells)
         .fill(null)
         .map(() => {return Array(numCells)});
-        console.log(gameBoardArray)
     }
 
-    // Se renderiza el objeto del DOM
-    // Se almacena en el id el índice de la matriz, así posteriormente
-    // Se puede identificar rápido cuando se pulser una celda
+    resetGameBoardArray();
+
+    const setGameBoardCell = (i, j, marker) => {
+        if (gameBoardArray[i][j] == null) {
+            gameBoardArray[i][j] = marker;
+
+            return true;
+        };
+
+        return false;
+        
+    };
+
+    const getGameBoardArray = () => {
+        return gameBoardArray;
+    };
+    
+    const getNumCells = () => {
+        return numCells;
+    };
+
+    return {setGameBoardCell,  resetGameBoardArray, getGameBoardArray, getNumCells};
+    
+})(3);
+
+const Player = (name, marker) => {
+    let playerScore = 0;
+    const playerMarker = marker;
+    const playerName = name;
+
+    const setPlayerScore = () => {
+        playerScore += 1;
+    };
+
+    const getPlayerScore = () => {
+        return playerScore;
+    };
+
+    const getPlayerMarker = () => {
+        return playerMarker;
+    }
+
+    const getPlayerName = () => {
+        return playerName;
+    }
+
+    return {getPlayerMarker, getPlayerName, getPlayerScore, setPlayerScore}
+
+};
+
+
+const DOMDisplay = (() => {
+    let gameBoardContainer = undefined;
+    const { getGameBoardArray, getNumCells } = Gameboard;
+    let gameBoardArray = getGameBoardArray();
+    const numCells = getNumCells();
+    let cells = [];
 
     const createTitle = () => {
         const title = document.createElement("h1");
@@ -25,14 +79,14 @@ const Gameboard = ((numCells) => {
         return title;
     }
 
-    const createScoreBoard = () => {
+    const createScoreBoard = (player1Name, player2Name) => {
         const scoreBoard = document.createElement("div");
         scoreBoard.setAttribute("id", "scoreboard");
         const player1Board = document.createElement("div");
         player1Board.setAttribute("id", "player1-board");
         const player1Title = document.createElement("h2");
         player1Title.setAttribute("id", "player1-title");
-        player1Title.textContent = "Player 1 [X]";
+        player1Title.textContent = `${player1Name} [X]`;
         const player1Score = document.createElement("p");
         player1Score.setAttribute("id", "player1-score");
         player1Score.textContent = "0";
@@ -44,7 +98,7 @@ const Gameboard = ((numCells) => {
         player2Board.setAttribute("id", "player2-board");
         const player2Title = document.createElement("h2");
         player2Title.setAttribute("id", "player2-title");
-        player2Title.textContent = "Player 2 [O]";
+        player2Title.textContent = `${player2Name} [O]`;
         const player2Score = document.createElement("p");
         player2Score.setAttribute("id", "player2-score");
         player2Score.textContent = "0";
@@ -61,7 +115,8 @@ const Gameboard = ((numCells) => {
     const createGameBoard = () => {
         const container = document.createElement('div');
         container.setAttribute("id", "gameboard-container");
-        gameBoardContainer = container
+        gameBoardContainer = container;
+        if (cells.length > 0) {cells = []};
         let cont = 0;
         for (let i = 0; i < gameBoardArray.length ; i++) {
             for (let j = 0; j < gameBoardArray.at(i).length ; j++) {
@@ -73,6 +128,7 @@ const Gameboard = ((numCells) => {
                 gameBoardCell.textContent = gameBoardArray[i][j]; 
                 gameBoardContainer.appendChild(gameBoardCell);
                 cont += 1;
+                cells.push(gameBoardCell);
                 if (cont >= numCells**2) {
                     break;
                 }
@@ -91,11 +147,11 @@ const Gameboard = ((numCells) => {
         return button;
     }
 
-    const createLayout = () => {
+    const createLayout = (player1Name, player2Name) => {
         const body = document.querySelector("body");
         const title = createTitle();
         const gameBoardContainer = createGameBoard();
-        const scoreBoard = createScoreBoard();
+        const scoreBoard = createScoreBoard(player1Name, player2Name);
         const newGameButton = createNewGameButton();
         body.appendChild(title)
         body.appendChild(scoreBoard)
@@ -103,11 +159,6 @@ const Gameboard = ((numCells) => {
         body.appendChild(newGameButton);
 
     }
-
-    resetGameBoardArray();
-    createLayout();
-
-    const cells = document.querySelectorAll("div.cell");
     const renderGameBoard = () => { 
         for (const cell of cells) {
             let [xCord, yCord] = cell.id
@@ -116,50 +167,12 @@ const Gameboard = ((numCells) => {
             cell.textContent = gameBoardArray[xCord][yCord];
         };
     }
-
-    const setGameBoardCell = (i, j, marker) => {
-        if (gameBoardArray[i][j] == null) {
-            gameBoardArray[i][j] = marker;
-
-            return true;
-        };
-
-        return false;
-        
-    };
-
     const getCells = () => {
         return cells;
     };
 
-    const getGambeBoardArray = () => {
-        return gameBoardArray
-    };
-    
-
-    return {getCells, getGambeBoardArray, setGameBoardCell, createGameBoard, resetGameBoardArray, renderGameBoard};
-    
-})(3);
-
-const Player = (marker) => {
-    let playerScore = 0;
-    const playerMarker = marker;
-
-    const setPlayerScore = () => {
-        playerScore += 1;
-    };
-
-    const getPlayerScore = () => {
-        return playerScore;
-    };
-
-    const getPlayerMarker = () => {
-        return playerMarker;
-    }
-
-    return {getPlayerMarker, getPlayerScore, setPlayerScore}
-
-}
+    return { createGameBoard, createLayout, renderGameBoard, getCells };
+})();
 
 const Game = (() => {
     let player;
@@ -167,9 +180,13 @@ const Game = (() => {
     let scoreID = 0;
     let endGame = false;
     let correctSelect = true;
-    const player1 = Player('X');
-    const player2 = Player('O');
-    const {getCells, getGambeBoardArray, setGameBoardCell, createGameBoard, resetGameBoardArray, renderGameBoard} = Gameboard;
+    const player1 = Player('Tanvi', 'X');
+    const player2 = Player('Marc', 'O');
+    const { createGameBoard, createLayout, renderGameBoard, getCells } = DOMDisplay;
+    
+    createLayout(player1.getPlayerName(), player2.getPlayerName());
+    
+    const { getGameBoardArray, setGameBoardCell, resetGameBoardArray } = Gameboard;
     const cells = getCells();
     const setMarker = (cell, marker) => {
         const cellCoordinates = cell.id;
@@ -185,7 +202,7 @@ const Game = (() => {
 
     const getCombinations = () => {
         // Extraemos filas
-        const rows = getGambeBoardArray();
+        const rows = getGameBoardArray();
         let diagonal = [];
         let diagonalInv = [];
 
@@ -209,7 +226,7 @@ const Game = (() => {
 
     const isWinner = (marker) => {
         const combinations = getCombinations();
-        const winnerCombination = JSON.stringify(Array(getGambeBoardArray().length).fill(marker));
+        const winnerCombination = JSON.stringify(Array(getGameBoardArray().length).fill(marker));
         for (const combination of combinations) {
             if (JSON.stringify(combination) === winnerCombination) {
                 return true
@@ -241,6 +258,7 @@ const Game = (() => {
     cells.forEach( (cell) => {
         cell.addEventListener("click", () => {
             if (!endGame) {
+                console.log("entro")
                 playTurn(cell);
                 updatePlayerScore();
             }
@@ -250,6 +268,7 @@ const Game = (() => {
     const button = document.getElementById("new-game");
     button.addEventListener("click",
         () => {
+            console.log("entro new game")
             resetGameBoardArray();
             createGameBoard();
             renderGameBoard();
@@ -261,25 +280,3 @@ const Game = (() => {
     );
 
 })()
-
-
-// - Jugadores
-// - Objeto de Control de Juego
-
-// 1 Objeto
-// - Renderizador: Mostrar la lógica en el DOM
-
-
-// Utilizar factories lo mas que se puede
-// Para objetos que se vayan a utilizar una vez utilizar IIFE
-
-// Añadir lógica cuando alguien gana 3 en ralla
-// Añadir lógica cuando hay empate
-// Añadir lógica cuando el juego se ha terminado
-
-// Añadir lógica para que el jugador añade marcas al tablero
-// Añadir lógica para que el jugador no pueda marcar casillas ya marcadas
-
-// Añadir lógica de limpieza
-// Añadir start/restart
-// Mostrar resultados   
