@@ -77,6 +77,17 @@ body {
     justify-content: stretch;
 }
 
+#resultBoard {
+    width: 400px;
+    height: 100px;
+    font-weight: bold;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--side-board-color);
+    background-color: var(--main-board-color);
+    text-align: center;
+    align-content: center;
+}
+
 .cell {
     border: 1px solid var(--side-board-color);
     background-color: var(--main-board-color);

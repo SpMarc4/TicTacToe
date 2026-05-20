@@ -12,6 +12,7 @@ const Gameboard = ((numCells) => {
         gameBoardArray = Array(numCells)
         .fill(null)
         .map(() => {return Array(numCells)});
+        return gameBoardArray;
     }
 
     resetGameBoardArray();
@@ -112,7 +113,7 @@ const DOMDisplay = (() => {
         return scoreBoard;
     }
 
-    const createGameBoard = () => {
+    const createGameBoard = (gameBoardArray) => {
         const container = document.createElement('div');
         container.setAttribute("id", "gameboard-container");
         gameBoardContainer = container;
@@ -139,6 +140,12 @@ const DOMDisplay = (() => {
         
     }
 
+    const createResultBoard = (message) => {
+        const resultBoard = document.createElement("div");
+        resultBoard.setAttribute("id", "resultBoard");
+        return resultBoard;
+    }
+
     const createNewGameButton = () => {
         const button = document.createElement("button");
         button.setAttribute("id", "new-game");
@@ -150,22 +157,26 @@ const DOMDisplay = (() => {
     const createLayout = (player1Name, player2Name) => {
         const body = document.querySelector("body");
         const title = createTitle();
-        const gameBoardContainer = createGameBoard();
+        const gameBoardContainer = createGameBoard(gameBoardArray);
         const scoreBoard = createScoreBoard(player1Name, player2Name);
+        const resultBoard = createResultBoard("");
         const newGameButton = createNewGameButton();
         body.appendChild(title)
         body.appendChild(scoreBoard)
         body.appendChild(gameBoardContainer);
+        body.appendChild(resultBoard);
         body.appendChild(newGameButton);
 
     }
-    const renderGameBoard = () => { 
+    const renderGameBoard = (gameBoardArray) => { 
         for (const cell of cells) {
             let [xCord, yCord] = cell.id
             .split('-')
             .map((coordinate) => parseInt(coordinate));
             cell.textContent = gameBoardArray[xCord][yCord];
         };
+        console.log(gameBoardArray)
+
     }
     const getCells = () => {
         return cells;
@@ -187,6 +198,8 @@ const Game = (() => {
     createLayout(player1.getPlayerName(), player2.getPlayerName());
     
     const { getGameBoardArray, setGameBoardCell, resetGameBoardArray } = Gameboard;
+    let gameBoardArray = getGameBoardArray();
+    
     const cells = getCells();
     const setMarker = (cell, marker) => {
         const cellCoordinates = cell.id;
@@ -229,16 +242,17 @@ const Game = (() => {
         const winnerCombination = JSON.stringify(Array(getGameBoardArray().length).fill(marker));
         for (const combination of combinations) {
             if (JSON.stringify(combination) === winnerCombination) {
-                return true
+                return 'win'
             }
         }
-        return false
+// TODO Verificar lógica de empate.
+        if (combinations.every(elem => !elem)) {return 'draw'};
     }
 
     const playTurn = (cell) => {
         selectPlayer()
         setMarker(cell, player.getPlayerMarker());
-        renderGameBoard();
+        renderGameBoard(gameBoardArray);
         scoreID = (playerTurn % 2 == 0) ? "player1-score" : "player2-score";
         if (correctSelect) {
             playerTurn += 1
@@ -246,11 +260,22 @@ const Game = (() => {
     }
 
     const updatePlayerScore = () => {
-        if (isWinner(player.getPlayerMarker())) {
+        const result = isWinner(player.getPlayerMarker());
+        if ( result === 'win') {
             player.setPlayerScore();
             const playerScore = document.getElementById(scoreID);
+            const resultBoard = document.getElementById('resultBoard');
+            const playerName = player.getPlayerName();
             playerScore.textContent = player.getPlayerScore();
+            resultBoard.textContent = `Player: ${playerName} wins!`
             console.log(`Player ${player.getPlayerMarker()} - Score: ${player.getPlayerScore()}`);
+            endGame = true;
+        }
+
+        else if ( result === 'draw') {
+            const resultBoard = document.getElementById('resultBoard');
+            resultBoard.textContent = "It's a draw"
+            console.log("It's a draw");
             endGame = true;
         }
     }
@@ -269,9 +294,10 @@ const Game = (() => {
     button.addEventListener("click",
         () => {
             console.log("entro new game")
-            resetGameBoardArray();
-            createGameBoard();
-            renderGameBoard();
+            gameBoardArray = resetGameBoardArray();
+            const resultBoard = document.getElementById('resultBoard');
+            resultBoard.textContent = ``
+            renderGameBoard(gameBoardArray);
             player;
             playerTurn = 2;
             endGame = false;
