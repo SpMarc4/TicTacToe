@@ -40,10 +40,11 @@ const Gameboard = ((numCells) => {
     
 })(3);
 
-const Player = (name, marker) => {
+const Player = (marker) => {
     let playerScore = 0;
     const playerMarker = marker;
-    const playerName = name;
+    let playerID = crypto.randomUUID();
+
 
     const setPlayerScore = () => {
         playerScore += 1;
@@ -57,11 +58,18 @@ const Player = (name, marker) => {
         return playerMarker;
     }
 
+    const getPlayerID = () => {
+        return playerID;
+    } 
+
     const getPlayerName = () => {
-        return playerName;
+        const playerTitle = document.getElementById(playerID);
+        console.log(playerTitle)
+        console.log(playerTitle.value)
+        return playerTitle.value;
     }
 
-    return {getPlayerMarker, getPlayerName, getPlayerScore, setPlayerScore}
+    return { getPlayerScore, getPlayerMarker, getPlayerID ,getPlayerName, setPlayerScore }
 
 };
 
@@ -80,14 +88,16 @@ const DOMDisplay = (() => {
         return title;
     }
 
-    const createScoreBoard = (player1Name, player2Name) => {
+    const createScoreBoard = (player1, player2) => {
         const scoreBoard = document.createElement("div");
         scoreBoard.setAttribute("id", "scoreboard");
         const player1Board = document.createElement("div");
         player1Board.setAttribute("id", "player1-board");
-        const player1Title = document.createElement("h2");
-        player1Title.setAttribute("id", "player1-title");
-        player1Title.textContent = `${player1Name} [X]`;
+        const player1Title = document.createElement("input");
+        const player1ID = player1.getPlayerID();
+        player1Title.setAttribute("type", "text");
+        player1Title.setAttribute("class", "player-title");
+        player1Title.setAttribute("id", player1ID);
         const player1Score = document.createElement("p");
         player1Score.setAttribute("id", "player1-score");
         player1Score.textContent = "0";
@@ -97,9 +107,11 @@ const DOMDisplay = (() => {
  
         const player2Board = document.createElement("div");
         player2Board.setAttribute("id", "player2-board");
-        const player2Title = document.createElement("h2");
-        player2Title.setAttribute("id", "player2-title");
-        player2Title.textContent = `${player2Name} [O]`;
+        const player2Title = document.createElement("input");
+        const player2ID = player2.getPlayerID();
+        player2Title.setAttribute("type", "text");
+        player2Title.setAttribute("class", "player-title");
+        player2Title.setAttribute("id", player2ID);
         const player2Score = document.createElement("p");
         player2Score.setAttribute("id", "player2-score");
         player2Score.textContent = "0";
@@ -154,11 +166,11 @@ const DOMDisplay = (() => {
         return button;
     }
 
-    const createLayout = (player1Name, player2Name) => {
+    const createLayout = (player1, player2) => {
         const body = document.querySelector("body");
         const title = createTitle();
         const gameBoardContainer = createGameBoard(gameBoardArray);
-        const scoreBoard = createScoreBoard(player1Name, player2Name);
+        const scoreBoard = createScoreBoard(player1, player2);
         const resultBoard = createResultBoard("");
         const newGameButton = createNewGameButton();
         body.appendChild(title)
@@ -191,11 +203,11 @@ const Game = (() => {
     let scoreID = 0;
     let endGame = false;
     let correctSelect = true;
-    const player1 = Player('Tanvi', 'X');
-    const player2 = Player('Marc', 'O');
-    const { createGameBoard, createLayout, renderGameBoard, getCells } = DOMDisplay;
+    const player1 = Player('X');
+    const player2 = Player('O');
+    const { createLayout, renderGameBoard, getCells } = DOMDisplay;
     
-    createLayout(player1.getPlayerName(), player2.getPlayerName());
+    createLayout(player1, player2);
     
     const { getGameBoardArray, setGameBoardCell, resetGameBoardArray } = Gameboard;
     let gameBoardArray = getGameBoardArray();
@@ -237,6 +249,16 @@ const Game = (() => {
         return combinations
     }
 
+    function isDraw() {
+    const gameBoardArray = getGameBoardArray();
+    for (let row of gameBoardArray) {
+        if (row.includes(undefined)) {
+            return ''; // No es empate, aún hay celdas vacías
+        }
+    }
+    return 'draw'; // Todas las celdas están llenas, es empate
+}
+
     const isWinner = (marker) => {
         const combinations = getCombinations();
         const winnerCombination = JSON.stringify(Array(getGameBoardArray().length).fill(marker));
@@ -245,8 +267,8 @@ const Game = (() => {
                 return 'win'
             }
         }
-// TODO Verificar lógica de empate.
-        if (combinations.every(elem => !elem)) {return 'draw'};
+        // TODO Verificar lógica de empate.
+        return isDraw(combinations);
     }
 
     const playTurn = (cell) => {
